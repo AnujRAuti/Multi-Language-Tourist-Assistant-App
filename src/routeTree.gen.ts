@@ -9,38 +9,101 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as EmergencyRouteImport } from './routes/emergency'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ScanModeRouteImport } from './routes/scan.$mode'
+import { Route as ApiEmergencyPhrasesRouteImport } from './routes/api/emergency-phrases'
+import { Route as ApiAnalyzeRouteImport } from './routes/api/analyze'
 
+const EmergencyRoute = EmergencyRouteImport.update({
+  id: '/emergency',
+  path: '/emergency',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ScanModeRoute = ScanModeRouteImport.update({
+  id: '/scan/$mode',
+  path: '/scan/$mode',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiEmergencyPhrasesRoute = ApiEmergencyPhrasesRouteImport.update({
+  id: '/api/emergency-phrases',
+  path: '/api/emergency-phrases',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAnalyzeRoute = ApiAnalyzeRouteImport.update({
+  id: '/api/analyze',
+  path: '/api/analyze',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/emergency': typeof EmergencyRoute
+  '/api/analyze': typeof ApiAnalyzeRoute
+  '/api/emergency-phrases': typeof ApiEmergencyPhrasesRoute
+  '/scan/$mode': typeof ScanModeRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/emergency': typeof EmergencyRoute
+  '/api/analyze': typeof ApiAnalyzeRoute
+  '/api/emergency-phrases': typeof ApiEmergencyPhrasesRoute
+  '/scan/$mode': typeof ScanModeRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/emergency': typeof EmergencyRoute
+  '/api/analyze': typeof ApiAnalyzeRoute
+  '/api/emergency-phrases': typeof ApiEmergencyPhrasesRoute
+  '/scan/$mode': typeof ScanModeRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/emergency'
+    | '/api/analyze'
+    | '/api/emergency-phrases'
+    | '/scan/$mode'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/emergency'
+    | '/api/analyze'
+    | '/api/emergency-phrases'
+    | '/scan/$mode'
+  id:
+    | '__root__'
+    | '/'
+    | '/emergency'
+    | '/api/analyze'
+    | '/api/emergency-phrases'
+    | '/scan/$mode'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  EmergencyRoute: typeof EmergencyRoute
+  ApiAnalyzeRoute: typeof ApiAnalyzeRoute
+  ApiEmergencyPhrasesRoute: typeof ApiEmergencyPhrasesRoute
+  ScanModeRoute: typeof ScanModeRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/emergency': {
+      id: '/emergency'
+      path: '/emergency'
+      fullPath: '/emergency'
+      preLoaderRoute: typeof EmergencyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,11 +111,36 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/scan/$mode': {
+      id: '/scan/$mode'
+      path: '/scan/$mode'
+      fullPath: '/scan/$mode'
+      preLoaderRoute: typeof ScanModeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/emergency-phrases': {
+      id: '/api/emergency-phrases'
+      path: '/api/emergency-phrases'
+      fullPath: '/api/emergency-phrases'
+      preLoaderRoute: typeof ApiEmergencyPhrasesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/analyze': {
+      id: '/api/analyze'
+      path: '/api/analyze'
+      fullPath: '/api/analyze'
+      preLoaderRoute: typeof ApiAnalyzeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  EmergencyRoute: EmergencyRoute,
+  ApiAnalyzeRoute: ApiAnalyzeRoute,
+  ApiEmergencyPhrasesRoute: ApiEmergencyPhrasesRoute,
+  ScanModeRoute: ScanModeRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
