@@ -9,11 +9,17 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as EmergencyRouteImport } from './routes/emergency'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ScanModeRouteImport } from './routes/scan.$mode'
 import { Route as ApiEmergencyPhrasesRouteImport } from './routes/api/emergency-phrases'
 import { Route as ApiAnalyzeRouteImport } from './routes/api/analyze'
 
+const EmergencyRoute = EmergencyRouteImport.update({
+  id: '/emergency',
+  path: '/emergency',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -37,12 +43,14 @@ const ApiAnalyzeRoute = ApiAnalyzeRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/emergency': typeof EmergencyRoute
   '/api/analyze': typeof ApiAnalyzeRoute
   '/api/emergency-phrases': typeof ApiEmergencyPhrasesRoute
   '/scan/$mode': typeof ScanModeRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/emergency': typeof EmergencyRoute
   '/api/analyze': typeof ApiAnalyzeRoute
   '/api/emergency-phrases': typeof ApiEmergencyPhrasesRoute
   '/scan/$mode': typeof ScanModeRoute
@@ -50,18 +58,30 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/emergency': typeof EmergencyRoute
   '/api/analyze': typeof ApiAnalyzeRoute
   '/api/emergency-phrases': typeof ApiEmergencyPhrasesRoute
   '/scan/$mode': typeof ScanModeRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/api/analyze' | '/api/emergency-phrases' | '/scan/$mode'
+  fullPaths:
+    | '/'
+    | '/emergency'
+    | '/api/analyze'
+    | '/api/emergency-phrases'
+    | '/scan/$mode'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/api/analyze' | '/api/emergency-phrases' | '/scan/$mode'
+  to:
+    | '/'
+    | '/emergency'
+    | '/api/analyze'
+    | '/api/emergency-phrases'
+    | '/scan/$mode'
   id:
     | '__root__'
     | '/'
+    | '/emergency'
     | '/api/analyze'
     | '/api/emergency-phrases'
     | '/scan/$mode'
@@ -69,6 +89,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  EmergencyRoute: typeof EmergencyRoute
   ApiAnalyzeRoute: typeof ApiAnalyzeRoute
   ApiEmergencyPhrasesRoute: typeof ApiEmergencyPhrasesRoute
   ScanModeRoute: typeof ScanModeRoute
@@ -76,6 +97,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/emergency': {
+      id: '/emergency'
+      path: '/emergency'
+      fullPath: '/emergency'
+      preLoaderRoute: typeof EmergencyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -109,6 +137,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  EmergencyRoute: EmergencyRoute,
   ApiAnalyzeRoute: ApiAnalyzeRoute,
   ApiEmergencyPhrasesRoute: ApiEmergencyPhrasesRoute,
   ScanModeRoute: ScanModeRoute,
