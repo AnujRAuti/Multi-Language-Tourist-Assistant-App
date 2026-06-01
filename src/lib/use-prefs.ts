@@ -25,11 +25,34 @@ function read(): Prefs {
   }
 }
 
+// Module-level store so every usePrefs() consumer stays in sync.
+let current: Prefs = DEFAULTS;
+const listeners = new Set<(p: Prefs) => void>();
+
+function setAll(next: Prefs) {
+  current = next;
+  listeners.forEach((l) => l(next));
+}
+
 export function usePrefs() {
-  const [prefs, setPrefs] = useState<Prefs>(DEFAULTS);
+  const [prefs, setPrefs] = useState<Prefs>(current);
 
   useEffect(() => {
-    setPrefs(read());
+    // Hydrate from storage on first mount, then broadcast.
+    if (listeners.size === 0) {
+      current = read();
+    }
+    setPrefs(current);
+    const listener = (p: Prefs) => setPrefs(p);
+    listeners.add(listener);
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === KEY) setAll(read());
+    };
+    window.addEventListener("storage", onStorage);
+    return () => {
+      listeners.delete(listener);
+      window.removeEventListener("storage", onStorage);
+    };
   }, []);
 
   useEffect(() => {
@@ -38,15 +61,13 @@ export function usePrefs() {
   }, [prefs.theme]);
 
   const update = (patch: Partial<Prefs>) => {
-    setPrefs((prev) => {
-      const next = { ...prev, ...patch };
-      try {
-        window.localStorage.setItem(KEY, JSON.stringify(next));
-      } catch {
-        // ignore quota / private mode errors
-      }
-      return next;
-    });
+    const next = { ...current, ...patch };
+    try {
+      window.localStorage.setItem(KEY, JSON.stringify(next));
+    } catch {
+      // ignore quota / private mode errors
+    }
+    setAll(next);
   };
 
   return { prefs, update };
